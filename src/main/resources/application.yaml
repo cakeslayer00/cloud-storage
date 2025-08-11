@@ -1,0 +1,15 @@
+spring:
+  application:
+    name:
+      cloud-file-storage
+  config:
+    import: file:.env[.properties]
+
+  liquibase:
+    enabled: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/${POSTGRES_DB}
