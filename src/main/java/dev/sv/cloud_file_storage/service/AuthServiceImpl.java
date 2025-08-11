@@ -30,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
+    private final DirectoryService directoryService;
 
     @Override
     @Transactional
@@ -56,6 +57,8 @@ public class AuthServiceImpl implements AuthService {
             user.setUsername(requestDto.username());
             user.setPassword(passwordEncoder.encode(requestDto.password()));
             userRepository.save(user);
+
+            directoryService.createUserDirectory(user);
         } catch (DataIntegrityViolationException e) {
             throw new UsernameAlreadyTakenException(USERNAME_IS_ALREADY_TAKEN.formatted(requestDto.username()));
         }
