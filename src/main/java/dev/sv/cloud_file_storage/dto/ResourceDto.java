@@ -1,10 +1,8 @@
 package dev.sv.cloud_file_storage.dto;
 
-public class ResourceDto {
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-    private String path;
-    private String name;
-    private String size;
-    private String type;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ResourceDto(String path, String name, Long size, String type) {
 
 }
