@@ -1,15 +1,19 @@
 package dev.sv.cloud_file_storage.utils;
 
+import lombok.Getter;
+
 import static dev.sv.cloud_file_storage.utils.PathUtils.appendRootPrefix;
 import static dev.sv.cloud_file_storage.utils.PathUtils.normalize;
 
 public class Path {
 
+    @Getter
+    private final String prefix;
     private final String normal;
     private final String absolute;
 
     public Path(String path, Long id) {
-        String prefix = "user-%s-files/".formatted(id);
+        this.prefix = "user-%s-files/".formatted(id);
 
         if (path.contains(prefix)) {
             path = path.replace(prefix, "");
@@ -42,4 +46,5 @@ public class Path {
     public String getNormalPath() {
         return normal;
     }
+
 }

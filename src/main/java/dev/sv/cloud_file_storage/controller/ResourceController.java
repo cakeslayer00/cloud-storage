@@ -59,7 +59,7 @@ public class ResourceController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public List<ResourceDto> upload(@RequestParam("path") String path,
-                                    @RequestParam("files") MultipartFile[] files,
+                                    @RequestParam("object") MultipartFile[] files,
                                     @AuthenticationPrincipal PersistentUserDetails user) {
         return service.uploadResource(path, files, user.getId());
     }

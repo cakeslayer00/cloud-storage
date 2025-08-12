@@ -2,6 +2,12 @@ spring:
   application:
     name:
       cloud-file-storage
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
   config:
     import: file:.env[.properties]
 
