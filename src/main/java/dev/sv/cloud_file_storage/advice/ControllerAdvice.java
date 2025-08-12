@@ -11,15 +11,27 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ControllerAdvice {
 
+    @ExceptionHandler(InvalidPathException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponseDto handleInvalidPath(InvalidPathException ex) {
+        return new ErrorResponseDto(ex.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponseDto handleResourceNotFound(ResourceNotFoundException ex) {
+        return new ErrorResponseDto(ex.getMessage());
+    }
+
     @ExceptionHandler(ResourceAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDto handleResourceAlreadyExists(ResourceAlreadyExistsException ex) {
         return new ErrorResponseDto(ex.getMessage());
     }
 
-    @ExceptionHandler(InvalidFilenameException.class)
+    @ExceptionHandler(InvalidFileNameException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDto handleInvalidFilename(InvalidFilenameException ex) {
+    public ErrorResponseDto handleInvalidFilename(InvalidFileNameException ex) {
         return new ErrorResponseDto(ex.getMessage());
     }
 

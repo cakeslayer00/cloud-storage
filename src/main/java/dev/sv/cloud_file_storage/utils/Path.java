@@ -38,4 +38,8 @@ public class Path {
     public String getAbsolutePath() {
         return absolute;
     }
+
+    public String getNormalPath() {
+        return normal;
+    }
 }
