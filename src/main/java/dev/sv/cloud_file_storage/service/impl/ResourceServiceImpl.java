@@ -1,4 +1,4 @@
-package dev.sv.cloud_file_storage.service;
+package dev.sv.cloud_file_storage.service.impl;
 
 import dev.sv.cloud_file_storage.dto.ResourceDto;
 import dev.sv.cloud_file_storage.entity.User;
@@ -7,6 +7,8 @@ import dev.sv.cloud_file_storage.exception.InvalidOperationException;
 import dev.sv.cloud_file_storage.exception.ResourceAlreadyExistsException;
 import dev.sv.cloud_file_storage.exception.ResourceNotFoundException;
 import dev.sv.cloud_file_storage.mapper.ResourceMapper;
+import dev.sv.cloud_file_storage.service.MinioService;
+import dev.sv.cloud_file_storage.service.ResourceService;
 import dev.sv.cloud_file_storage.utils.Path;
 import dev.sv.cloud_file_storage.utils.PathUtils;
 import io.minio.ObjectWriteResponse;

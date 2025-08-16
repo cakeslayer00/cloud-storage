@@ -1,6 +1,6 @@
 package dev.sv.cloud_file_storage.controller;
 
-import dev.sv.cloud_file_storage.config.PersistentUserDetails;
+import dev.sv.cloud_file_storage.config.security.PersistentUserDetails;
 import dev.sv.cloud_file_storage.dto.ResourceDto;
 import dev.sv.cloud_file_storage.service.ResourceService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package dev.sv.cloud_file_storage.config;
+package dev.sv.cloud_file_storage.config.minio;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

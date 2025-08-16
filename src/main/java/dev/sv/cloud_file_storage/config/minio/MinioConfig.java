@@ -1,4 +1,4 @@
-package dev.sv.cloud_file_storage.config;
+package dev.sv.cloud_file_storage.config.minio;
 
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;

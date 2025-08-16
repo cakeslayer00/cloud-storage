@@ -1,4 +1,4 @@
-package dev.sv.cloud_file_storage.config;
+package dev.sv.cloud_file_storage.config.security;
 
 import dev.sv.cloud_file_storage.entity.User;
 import dev.sv.cloud_file_storage.exception.UserNotFoundException;

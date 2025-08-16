@@ -1,6 +1,7 @@
-package dev.sv.cloud_file_storage.service;
+package dev.sv.cloud_file_storage.service.impl;
 
-import dev.sv.cloud_file_storage.config.MinioProperties;
+import dev.sv.cloud_file_storage.config.minio.MinioProperties;
+import dev.sv.cloud_file_storage.service.MinioService;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Item;

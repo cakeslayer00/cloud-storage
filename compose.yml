@@ -39,7 +39,7 @@ services:
       retries: 3
 
   redis:
-    image: redis:7-alpine
+    image: redis:alpine
     container_name: redis-server
     restart: unless-stopped
 
