@@ -44,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponseDto authenticate(AuthRequestDto requestDto,
                                         HttpServletRequest request,
                                         HttpServletResponse response) {
+
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(requestDto.username(), requestDto.password())
@@ -66,6 +67,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponseDto register(AuthRequestDto requestDto,
                                     HttpServletRequest request,
                                     HttpServletResponse response) {
+
         try {
             User user = new User();
             user.setUsername(requestDto.username());

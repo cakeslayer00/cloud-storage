@@ -141,4 +141,5 @@ public class MinioServiceImpl implements MinioService {
             throw new RuntimeException(e);
         }
     }
+
 }

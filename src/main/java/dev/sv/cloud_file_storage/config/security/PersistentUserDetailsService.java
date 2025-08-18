@@ -24,4 +24,5 @@ public class PersistentUserDetailsService implements UserDetailsService {
 
         return new PersistentUserDetails(user);
     }
+
 }

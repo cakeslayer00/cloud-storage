@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Table(name = "users")
 @NoArgsConstructor
 public class User implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,4 +21,5 @@ public class User implements Serializable {
     private String username;
     @Column(nullable = false)
     private String password;
+
 }

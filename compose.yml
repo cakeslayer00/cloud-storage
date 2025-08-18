@@ -4,9 +4,9 @@ services:
     container_name: postgres_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-mydb}
+      POSTGRES_DB: ${POSTGRES_DB:-myapp}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-suckmahballs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-loveyou}
     ports:
       - "5432:5432"
     volumes:
@@ -47,11 +47,11 @@ services:
       - "6379:6379"
 
     environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-suckmahballs}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-loveyou}
 
     command: >
       redis-server
-      --requirepass suckmahballs
+      --requirepass loveyou
       --appendonly yes
       --appendfsync everysec
       --maxmemory 512mb

@@ -3,13 +3,12 @@ package dev.sv.cloud_file_storage.utils;
 import dev.sv.cloud_file_storage.exception.InvalidPathException;
 import lombok.experimental.UtilityClass;
 
-
 @UtilityClass
 public class PathUtils {
 
     /**
      * @param path Assuming path is normalized
-     * @param id User identification number user for prefix
+     * @param id User identification number for user prefix
      * @return Fully assembled path with user prefix
      */
     public static String appendRootPrefix(String path, Long id) {

@@ -17,4 +17,5 @@ public class UserController {
     public AuthResponseDto getUser(Authentication authentication) {
         return new AuthResponseDto(authentication.getName());
     }
+
 }
