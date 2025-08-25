@@ -1,4 +1,4 @@
-package dev.sv.cloud_file_storage.user;
+package dev.sv.cloud_file_storage.authService;
 
 import dev.sv.cloud_file_storage.dto.AuthRequestDto;
 import dev.sv.cloud_file_storage.entity.User;
@@ -7,16 +7,12 @@ import dev.sv.cloud_file_storage.repository.UserRepository;
 import dev.sv.cloud_file_storage.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
