@@ -28,20 +28,23 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static dev.sv.cloud_file_storage.utils.PathUtils.isDirectory;
 
 @Service
 @RequiredArgsConstructor
 public class ResourceServiceImpl implements ResourceService {
 
     private static final String DIRECTORY_ALREADY_EXISTS = "Directory '%s' already exists";
-    private static final String RESOURCE_ALREADY_EXISTS = "Resource '%s' already exists";
     private static final String DIRECTORY_NOT_FOUND = "Directory under path '%s' doesn't exist";
+
+    private static final String RESOURCE_ALREADY_EXISTS = "Resource '%s' already exists";
     private static final String RESOURCE_NOT_FOUND = "Resource under path '%s' doesn't exist";
+
     private static final String INVALID_FILE_NAME = "Invalid file name";
+
+    private static final String DIRECTORY_SEPARATOR = "/";
     private static final String USER_PREFIX = "user-%s-files/";
 
     private final MinioService minioService;
@@ -91,7 +94,7 @@ public class ResourceServiceImpl implements ResourceService {
                 zipDirectory(path, userId, response);
             }
             response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=\"%s\"".formatted(total.getFileName()));
+            response.setHeader("Content-Disposition", "attachment; filename=\"%s\"".formatted(total.getFilename()));
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
@@ -111,7 +114,7 @@ public class ResourceServiceImpl implements ResourceService {
             throw new ResourceAlreadyExistsException(RESOURCE_ALREADY_EXISTS);
         }
 
-        if (origin.getPathWithoutPrefixAndFile().equals(target.getPathWithoutPrefixAndFile())) {
+        if (origin.getPathWithoutPrefixAndFilename().equals(target.getPathWithoutPrefixAndFilename())) {
             rename(origin, target);
         } else {
             move(origin, target);
@@ -144,34 +147,32 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public List<ResourceDto> uploadResource(String path, MultipartFile[] files, Long userId) {
         Path total = new Path(path, userId);
-        List<String> paths = new ArrayList<>();
+        List<String> resourcePaths = new ArrayList<>();
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
             if (fileName == null) {
                 throw new InvalidFileNameException(INVALID_FILE_NAME);
             }
-            if (fileName.contains("/")) {
+            if (fileName.contains(DIRECTORY_SEPARATOR)) {
                 createDirectoriesRecursively(userId, fileName);
             }
             if (minioService.objectExists(total.getAbsolutePath() + fileName)) {
                 throw new ResourceAlreadyExistsException(RESOURCE_ALREADY_EXISTS.formatted(total.getNormalPath()) + fileName);
             }
 
-            paths.add(total.getAbsolutePath() + fileName);
+            resourcePaths.add(total.getAbsolutePath() + fileName);
             minioService.putObject(total.getAbsolutePath() + fileName, file);
         }
 
-        List<ResourceDto> resources = new ArrayList<>();
-        for (String p : paths) {
-            StatObjectResponse sor = minioService.statObject(p);
-            resources.add(resourceMapper.map(sor.size(), new Path(sor.object(), userId)));
-        }
-        return resources;
+        return resourcePaths.stream().map(resourcePath -> {
+            StatObjectResponse sor = minioService.statObject(resourcePath);
+            return resourceMapper.map(sor.size(), new Path(sor.object(), userId));
+        }).toList();
     }
 
     @Override
     public ResourceDto createDirectory(String path, Long userId) {
-        path = path.endsWith("/") ? path : path + "/";
+        path = path.endsWith(DIRECTORY_SEPARATOR) ? path : path + DIRECTORY_SEPARATOR;
         Path total = new Path(path, userId);
 
         if (minioService.objectExists(total.getAbsolutePath())) {
@@ -229,7 +230,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private void rename(Path source, Path target) {
-        if (source.getFileName().equals(target.getFileName())) {
+        if (source.getFilename().equals(target.getFilename())) {
             throw new InvalidOperationException("Target resource should have different name");
         }
 
@@ -238,7 +239,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private void move(Path source, Path target) {
-        if (!source.getFileName().equals(target.getFileName())) {
+        if (!source.getFilename().equals(target.getFilename())) {
             throw new InvalidOperationException("Target resource should have same name");
         }
 
@@ -246,14 +247,18 @@ public class ResourceServiceImpl implements ResourceService {
         minioService.removeObject(source.getAbsolutePath());
     }
 
-    private void downloadFile(String path, Long userId, HttpServletResponse response) throws IOException {
+    private void downloadFile(String path, Long userId, HttpServletResponse response)
+            throws IOException {
         Path total = new Path(path, userId);
         try (InputStream stream = minioService.getObject(total.getAbsolutePath())) {
             StreamUtils.copy(stream, response.getOutputStream());
         }
     }
 
-    private void zipDirectory(String path, Long userId, HttpServletResponse response) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private void zipDirectory(String path, Long userId, HttpServletResponse response)
+            throws IOException, ServerException, InsufficientDataException,
+            ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException,
+            InvalidResponseException, XmlParserException, InternalException {
         try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
             Path dir = new Path(path, userId);
             Iterable<Result<Item>> results = minioService.listObjects(dir.getAbsolutePath(), true);
@@ -262,7 +267,8 @@ public class ResourceServiceImpl implements ResourceService {
                 Item item = result.get();
                 String object = item.objectName();
 
-                if (dir.getAbsolutePath().equals(object) && isDirectory(object)) {
+                if (dir.getAbsolutePath().equals(object)
+                        && PathUtils.isDirectory(object)) {
                     continue;
                 }
 
@@ -290,10 +296,10 @@ public class ResourceServiceImpl implements ResourceService {
         Path total = new Path(fileName, userId);
 
         StringBuilder sb = new StringBuilder();
-        String[] split = total.getPathWithoutPrefixAndFile().split("/");
+        String[] split = total.getPathWithoutPrefixAndFilename().split(DIRECTORY_SEPARATOR);
         for (String s : split) {
-            sb.append(s).append("/");
-            if (minioService.objectExists(total.getPrefix() + sb)) {
+            sb.append(s).append(DIRECTORY_SEPARATOR);
+            if (minioService.objectExists(USER_PREFIX.formatted(userId) + sb)) {
                 continue;
             }
             createDirectory(sb.toString(), userId);

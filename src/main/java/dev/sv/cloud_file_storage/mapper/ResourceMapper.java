@@ -9,8 +9,8 @@ public class ResourceMapper {
 
     public ResourceDto map(Long size, Path path) {
         return new ResourceDto(
-                path.getPathWithoutPrefixAndFile(),
-                path.getFileName(),
+                path.getPathWithoutPrefixAndFilename(),
+                path.getFilename(),
                 size == null || size == 0 ? null : size,
                 path.isDirectory() ? "DIRECTORY" : "FILE");
     }

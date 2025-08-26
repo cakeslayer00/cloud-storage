@@ -11,7 +11,7 @@ public class PathUtils {
      * @param id User identification number for user prefix
      * @return Fully assembled path with user prefix
      */
-    public static String appendRootPrefix(String path, Long id) {
+    public String appendRootPrefix(String path, Long id) {
         return "user-%s-files/%s".formatted(id, path);
     }
 
@@ -20,7 +20,7 @@ public class PathUtils {
      * @return Normal path with no consecutive slashes
      * @throws InvalidPathException in case path contains forbidden characters
      */
-    public static String normalize(String path) {
+    public String normalize(String path) {
         if (path.matches("[/\\\\\\x00-\\x1F\uFFFD]")) {
             throw new InvalidPathException("Invalid path or file name: %s".formatted(path));
         }
@@ -29,7 +29,7 @@ public class PathUtils {
                 .replaceFirst("^/", "");
     }
 
-    public static boolean isDirectory(String path) {
+    public boolean isDirectory(String path) {
         return path.endsWith("/");
     }
 
