@@ -31,17 +31,19 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static dev.sv.cloud_file_storage.utils.PathUtils.isDirectory;
-
 @Service
 @RequiredArgsConstructor
 public class ResourceServiceImpl implements ResourceService {
 
     private static final String DIRECTORY_ALREADY_EXISTS = "Directory '%s' already exists";
-    private static final String RESOURCE_ALREADY_EXISTS = "Resource '%s' already exists";
     private static final String DIRECTORY_NOT_FOUND = "Directory under path '%s' doesn't exist";
+
+    private static final String RESOURCE_ALREADY_EXISTS = "Resource '%s' already exists";
     private static final String RESOURCE_NOT_FOUND = "Resource under path '%s' doesn't exist";
+
     private static final String INVALID_FILE_NAME = "Invalid file name";
+
+    private static final String DIRECTORY_SEPARATOR = "/";
     private static final String USER_PREFIX = "user-%s-files/";
 
     private final MinioService minioService;
@@ -150,7 +152,7 @@ public class ResourceServiceImpl implements ResourceService {
             if (fileName == null) {
                 throw new InvalidFileNameException(INVALID_FILE_NAME);
             }
-            if (fileName.contains("/")) {
+            if (fileName.contains(DIRECTORY_SEPARATOR)) {
                 createDirectoriesRecursively(userId, fileName);
             }
             if (minioService.objectExists(total.getAbsolutePath() + fileName)) {
@@ -171,7 +173,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public ResourceDto createDirectory(String path, Long userId) {
-        path = path.endsWith("/") ? path : path + "/";
+        path = path.endsWith(DIRECTORY_SEPARATOR) ? path : path + DIRECTORY_SEPARATOR;
         Path total = new Path(path, userId);
 
         if (minioService.objectExists(total.getAbsolutePath())) {
@@ -246,14 +248,18 @@ public class ResourceServiceImpl implements ResourceService {
         minioService.removeObject(source.getAbsolutePath());
     }
 
-    private void downloadFile(String path, Long userId, HttpServletResponse response) throws IOException {
+    private void downloadFile(String path, Long userId, HttpServletResponse response)
+            throws IOException {
         Path total = new Path(path, userId);
         try (InputStream stream = minioService.getObject(total.getAbsolutePath())) {
             StreamUtils.copy(stream, response.getOutputStream());
         }
     }
 
-    private void zipDirectory(String path, Long userId, HttpServletResponse response) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private void zipDirectory(String path, Long userId, HttpServletResponse response)
+            throws IOException, ServerException, InsufficientDataException,
+            ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException,
+            InvalidResponseException, XmlParserException, InternalException {
         try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
             Path dir = new Path(path, userId);
             Iterable<Result<Item>> results = minioService.listObjects(dir.getAbsolutePath(), true);
@@ -262,7 +268,8 @@ public class ResourceServiceImpl implements ResourceService {
                 Item item = result.get();
                 String object = item.objectName();
 
-                if (dir.getAbsolutePath().equals(object) && isDirectory(object)) {
+                if (dir.getAbsolutePath().equals(object)
+                        && PathUtils.isDirectory(object)) {
                     continue;
                 }
 
@@ -290,10 +297,10 @@ public class ResourceServiceImpl implements ResourceService {
         Path total = new Path(fileName, userId);
 
         StringBuilder sb = new StringBuilder();
-        String[] split = total.getPathWithoutPrefixAndFile().split("/");
+        String[] split = total.getPathWithoutPrefixAndFile().split(DIRECTORY_SEPARATOR);
         for (String s : split) {
-            sb.append(s).append("/");
-            if (minioService.objectExists(total.getPrefix() + sb)) {
+            sb.append(s).append(DIRECTORY_SEPARATOR);
+            if (minioService.objectExists(USER_PREFIX.formatted(userId) + sb)) {
                 continue;
             }
             createDirectory(sb.toString(), userId);
