@@ -1,5 +1,7 @@
-package dev.sv.cloud_file_storage.authService;
+package dev.sv.cloud_file_storage.auth;
 
+import dev.sv.cloud_file_storage.config.AuthTestConfig;
+import dev.sv.cloud_file_storage.config.PostgreSQLContainer;
 import dev.sv.cloud_file_storage.dto.AuthRequestDto;
 import dev.sv.cloud_file_storage.entity.User;
 import dev.sv.cloud_file_storage.exception.UsernameAlreadyTakenException;
@@ -11,10 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,23 +21,13 @@ import static org.mockito.Mockito.mock;
 @DataJpaTest
 @Testcontainers
 @Import(AuthTestConfig.class)
-public class AuthTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.5-alpine3.22");
+public class AuthTest implements PostgreSQLContainer {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private AuthService authService;
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
 
     @Test
     void givenValidRequest_whenRegister_thenUserSavedToDatabase() {

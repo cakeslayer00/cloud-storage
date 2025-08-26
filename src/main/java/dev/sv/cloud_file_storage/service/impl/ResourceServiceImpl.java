@@ -28,6 +28,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -146,7 +147,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public List<ResourceDto> uploadResource(String path, MultipartFile[] files, Long userId) {
         Path total = new Path(path, userId);
-        List<String> paths = new ArrayList<>();
+        List<String> resourcePaths = new ArrayList<>();
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
             if (fileName == null) {
@@ -159,16 +160,14 @@ public class ResourceServiceImpl implements ResourceService {
                 throw new ResourceAlreadyExistsException(RESOURCE_ALREADY_EXISTS.formatted(total.getNormalPath()) + fileName);
             }
 
-            paths.add(total.getAbsolutePath() + fileName);
+            resourcePaths.add(total.getAbsolutePath() + fileName);
             minioService.putObject(total.getAbsolutePath() + fileName, file);
         }
 
-        List<ResourceDto> resources = new ArrayList<>();
-        for (String p : paths) {
-            StatObjectResponse sor = minioService.statObject(p);
-            resources.add(resourceMapper.map(sor.size(), new Path(sor.object(), userId)));
-        }
-        return resources;
+        return resourcePaths.stream().map(resourcePath -> {
+            StatObjectResponse sor = minioService.statObject(resourcePath);
+            return resourceMapper.map(sor.size(), new Path(sor.object(), userId));
+        }).toList();
     }
 
     @Override

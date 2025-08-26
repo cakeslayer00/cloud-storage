@@ -1,4 +1,4 @@
-package dev.sv.cloud_file_storage.authService;
+package dev.sv.cloud_file_storage.config;
 
 import dev.sv.cloud_file_storage.repository.UserRepository;
 import dev.sv.cloud_file_storage.service.AuthService;
