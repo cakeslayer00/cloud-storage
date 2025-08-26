@@ -2,8 +2,7 @@ package dev.sv.cloud_file_storage.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import static dev.sv.cloud_file_storage.utils.PathUtils.appendRootPrefix;
-import static dev.sv.cloud_file_storage.utils.PathUtils.normalize;
+import static dev.sv.cloud_file_storage.utils.PathUtils.*;
 
 public class Path {
 
@@ -23,11 +22,7 @@ public class Path {
         this.absolute = appendRootPrefix(normal, id);
     }
 
-    public boolean isDirectory() {
-        return normal.endsWith(DIRECTORY_SEPARATOR);
-    }
-
-    public String getFileName() {
+    public String getFilename() {
         if (isDirectory()) {
             int i = normal.length() - 2;
             while (i >= 0 && normal.charAt(i) != '/') i--;
@@ -36,8 +31,8 @@ public class Path {
         return normal.substring(normal.lastIndexOf(DIRECTORY_SEPARATOR) + 1);
     }
 
-    public String getPathWithoutPrefixAndFile() {
-        return normal.substring(0, normal.length() - getFileName().length());
+    public String getPathWithoutPrefixAndFilename() {
+        return normal.substring(0, normal.length() - getFilename().length());
     }
 
     public String getAbsolutePath() {
@@ -46,6 +41,10 @@ public class Path {
 
     public String getNormalPath() {
         return normal;
+    }
+
+    public boolean isDirectory() {
+        return normal.endsWith(DIRECTORY_SEPARATOR);
     }
 
 }

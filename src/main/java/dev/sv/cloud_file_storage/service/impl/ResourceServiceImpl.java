@@ -93,7 +93,7 @@ public class ResourceServiceImpl implements ResourceService {
                 zipDirectory(path, userId, response);
             }
             response.setContentType("application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=\"%s\"".formatted(total.getFileName()));
+            response.setHeader("Content-Disposition", "attachment; filename=\"%s\"".formatted(total.getFilename()));
         } catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
@@ -113,7 +113,7 @@ public class ResourceServiceImpl implements ResourceService {
             throw new ResourceAlreadyExistsException(RESOURCE_ALREADY_EXISTS);
         }
 
-        if (origin.getPathWithoutPrefixAndFile().equals(target.getPathWithoutPrefixAndFile())) {
+        if (origin.getPathWithoutPrefixAndFilename().equals(target.getPathWithoutPrefixAndFilename())) {
             rename(origin, target);
         } else {
             move(origin, target);
@@ -231,7 +231,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private void rename(Path source, Path target) {
-        if (source.getFileName().equals(target.getFileName())) {
+        if (source.getFilename().equals(target.getFilename())) {
             throw new InvalidOperationException("Target resource should have different name");
         }
 
@@ -240,7 +240,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private void move(Path source, Path target) {
-        if (!source.getFileName().equals(target.getFileName())) {
+        if (!source.getFilename().equals(target.getFilename())) {
             throw new InvalidOperationException("Target resource should have same name");
         }
 
@@ -297,7 +297,7 @@ public class ResourceServiceImpl implements ResourceService {
         Path total = new Path(fileName, userId);
 
         StringBuilder sb = new StringBuilder();
-        String[] split = total.getPathWithoutPrefixAndFile().split(DIRECTORY_SEPARATOR);
+        String[] split = total.getPathWithoutPrefixAndFilename().split(DIRECTORY_SEPARATOR);
         for (String s : split) {
             sb.append(s).append(DIRECTORY_SEPARATOR);
             if (minioService.objectExists(USER_PREFIX.formatted(userId) + sb)) {
